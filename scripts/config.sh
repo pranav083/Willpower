@@ -8,9 +8,11 @@
 # === Release Configuration ===
 # Update these values for your project
 
-SIGNING_IDENTITY="Developer ID Application: Ravi Riley (NJ2SQLUU4U)"
-NOTARY_PROFILE="willpower-notary"
-GITHUB_REPO="raviriley/Willpower"
+# Each of these can be overridden from the environment, which is how CI supplies
+# its own certificate, notary profile and release target without editing this file.
+SIGNING_IDENTITY="${SIGNING_IDENTITY:-Developer ID Application: Ravi Riley (NJ2SQLUU4U)}"
+NOTARY_PROFILE="${NOTARY_PROFILE:-willpower-notary}"
+GITHUB_REPO="${GITHUB_REPO:-raviriley/Willpower}"
 
 # === Derived paths ===
 # These are computed relative to the script that sources this file
