@@ -15,6 +15,7 @@ struct WillpowerApp: App {
     @State private var daemonManager = DaemonManager()
     @State private var updaterController = UpdaterController()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
     @State private var showOnboarding = false
     @State private var showDaemonSetup = false
 
@@ -33,6 +34,18 @@ struct WillpowerApp: App {
                     viewModel.daemonManager = daemonManager
                     daemonManager.refreshStatus()
 
+                    #if DEBUG
+                    // Debug builds are ad-hoc signed, so SMAppService can never
+                    // register the daemon. Both setup sheets refuse to dismiss until
+                    // it registers, which makes them a dead end that hides the rest
+                    // of the UI. Skip them locally and go straight into the app.
+                    // Release builds are unaffected: blocking really does need the daemon.
+                    hasCompletedOnboarding = true
+                    if viewModel.blocklists.isEmpty {
+                        viewModel.createBlocklist(name: "New Blocklist", domains: [])
+                    }
+                    viewModel.selectedCategory = .blocklists
+                    #else
                     if !hasCompletedOnboarding {
                         // First-time user: show full onboarding
                         showOnboarding = true
@@ -40,6 +53,7 @@ struct WillpowerApp: App {
                         // Returning user but daemon needs setup: show daemon setup only
                         showDaemonSetup = true
                     }
+                    #endif
                 }
                 // NOTE: Removed .onDisappear { viewModel.stopStateSync() }
                 // Browser monitoring now continues in background when window closes
